@@ -1,0 +1,30 @@
+{
+  "name": "dreamberd",
+  "version": "0.0.1",
+  "license": "Unlicense",
+  "description": "A perfect programming language.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch ./__dev__/dev.ts",
+    "test": "vitest run",
+    "test:dev": "vitest dev",
+    "grammar:generate": "ohm generateBundles --withTypes ./src/parser/grammar.ohm",
+    "grammar:generate:watch": "ohm generateBundles --esm --withTypes ./src/parser/grammar.ohm"
+  },
+  "devDependencies": {
+    "@ohm-js/cli": "^2.0.0",
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__template": "^7.4.1",
+    "chokidar": "^3.5.3",
+    "ohm-js": "^17.1.0",
+    "tsx": "^3.12.7",
+    "vitest": "^0.32.2"
+  },
+  "dependencies": {
+    "@babel/generator": "^7.22.5",
+    "@babel/parser": "^7.22.5",
+    "@babel/template": "^7.22.5",
+    "@babel/types": "^7.22.5"
+  }
+}

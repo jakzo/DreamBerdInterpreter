@@ -1,0 +1,134 @@
+DreamBerd {
+  Program = (Statement | eol)*
+
+  Statement
+    = StatementInner<Function>
+    | StatementInner<Assignment>
+    | StatementInner<Expression>
+    | EmptyStatement
+
+  StatementInner<Type>
+    = Type (statementEndExplicit | statementEndImplicit)
+
+  EmptyStatement
+    = statementEndExplicit
+
+  statementEndExplicit
+    = statementEndExclamation
+    | statementEndDebug
+  statementEndExclamation
+    = "!"+
+  statementEndDebug
+    = "?"
+  statementEndImplicit
+    = eol
+    | end
+
+  Function
+    = identifier identifier "(" ParameterList? ")" "=>" "{" Statement* "}"
+
+  ParameterList
+    = identifier ("," identifier)*
+
+  Assignment
+    = Expression assignmentOperator Expression
+
+  assignmentOperator
+    = "="
+    | "**="
+    | "*=" | "/="
+    | "+=" | "-="
+
+  Expression
+    = unaryOp
+    | binaryOp
+    | stringLiteral
+    | ParenthesizedExpression
+    | ControlFlow
+    | FunctionCall
+    | ArrayLiteral
+    | identifier
+    | IdentifierChain
+
+  ParenthesizedExpression
+    = "(" Expression ")"
+
+  ControlFlow
+    = identifier "(" Expression ")" "{" Statement* "}"
+
+  FunctionCall
+    = Expression "(" ExpressionList? ")"
+
+  ExpressionList
+    = Expression ("," Expression)*
+
+  ArrayLiteral
+    = "[" ExpressionList "]"
+
+  unaryOp
+    = "+" ws* applySyntactic<Expression>
+    | "-" ws* applySyntactic<Expression>
+    | ";" ws* applySyntactic<Expression>
+
+  binaryOp
+    = applySyntactic<Expression> ws* applySyntactic<BinaryOperator> ws* applySyntactic<Expression>
+
+  BinaryOperator
+    = "**"
+    | "*" | "/"
+    | "+" | "-"
+    | ">>" | "<<"
+    | "&" | "^" | "|"
+    | "<" | ">" | "<=" | ">="
+    | "=" | "==" | "===" | "===="
+    | "&&" | "||"
+
+  stringLiteral
+    = "'" stringLiteralInner<"'"> "'"
+    | "\"" stringLiteralInner<"\""> "\""
+
+  stringLiteralInner<quoteChar>
+    = stringLiteral
+    | stringContents<quoteChar>
+
+  stringContents<quoteChar>
+    = (~quoteChar ~eol (escapeChar | interpolation | stringChar))*
+
+  stringChar
+    = any
+
+  escapeChar
+    = "\\" any
+
+  interpolation
+    = currencySymbol "{" applySyntactic<Expression> "}"
+
+  currencySymbol
+    = "$" // TODO
+
+  IdentifierChain
+    = identifier (PropertyAccess | IndexAccess | identifier)+
+
+  PropertyAccess
+    = "." identifier
+
+  IndexAccess
+    = "[" Expression "]"
+
+  identifier
+    = (~symbol any)+
+
+  symbol
+    = eol | "\u0000".."/" | ":".."@" | "[".."^" | "`" | "{".."\u00ff"
+
+  ws
+    = ~eol space
+
+  comment
+    = "//" (~eol any)* (eol | end)
+
+  eol
+    = "\r\n" | "\n" | "\r" | "\u2028" | "\u2029"
+
+  spaces := (ws | comment)*
+}
